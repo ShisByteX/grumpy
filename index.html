@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Suchii 🌸 A Little Garden of Surprises</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tone.js for gentle music-box chimes (no external audio URLs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <!-- Google Fonts: Playfair Display, Inter, and Dancing Script -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Custom Theme Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        hand: ['Dancing Script', 'cursive'],
+                    },
+                    colors: {
+                        blush: {
+                            50: '#fff5f7',
+                            100: '#ffe4e9',
+                            200: '#fecdd8',
+                            300: '#fda4ba',
+                            400: '#fb7196',
+                            500: '#f43f72',
+                            600: '#e11d58',
+                        },
+                        sage: {
+                            50: '#f2f9f5',
+                            100: '#e1f2e8',
+                            500: '#3d9970',
+                            600: '#2d7a58',
+                        },
+                        cream: '#fffcf7',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Animations for Interactive Games, Petals & Surprises -->
+    <style>
+        body {
+            background: linear-gradient(180deg, #fff5f7 0%, #fffcf7 45%, #fff0f5 100%);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Gentle floating animation for decorative icons and gift boxes */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: floatSlow 3.8s ease-in-out infinite;
+        }
+
+        /* Subtle wiggle to invite tapping unopened gifts */
+        @keyframes giftWiggle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-3deg) scale(1.03); }
+            40% { transform: rotate(3deg) scale(1.03); }
+            60% { transform: rotate(-2deg) scale(1.02); }
+            80% { transform: rotate(2deg) scale(1.01); }
+        }
+        .gift-wiggle:hover {
+            animation: giftWiggle 0.65s ease-in-out;
+        }
+
+        /* Heartbeat pulse for wax seal and pocket hug */
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.12); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.08); }
+            60% { transform: scale(1); }
+        }
+        .animate-heartbeat {
+            animation: heartBeat 2.2s ease-in-out infinite;
+        }
+
+        /* Stamp pop-in animation when redeeming coupons */
+        @keyframes stampPop {
+            0% { transform: scale(2.2) rotate(-18deg); opacity: 0; }
+            65% { transform: scale(0.92) rotate(-12deg); opacity: 1; }
+            100% { transform: scale(1) rotate(-12deg); opacity: 1; }
+        }
+        .animate-stamp {
+            animation: stampPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Envelope opening transition */
+        .envelope-flap {
+            transform-origin: top center;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .envelope-open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        /* Smooth entrance fade */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.75s ease-out forwards;
+        }
+
+        /* Responsive canvas styling */
+        #petal-overlay-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        #garden-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="text-slate-800 font-sans antialiased selection:bg-blush-200 selection:text-blush-600">
+
+    <!-- Ambient Falling Petals & Flower Fireworks Overlay Canvas -->
+    <canvas id="petal-overlay-canvas" aria-hidden="true"></canvas>
+
+    <!-- ========================================================= -->
+    <!-- INTRO OVERLAY: WAX-SEALED SURPRISE ENVELOPE FOR SUCHII     -->
+    <!-- ========================================================= -->
+    <div id="intro-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-rose-100 via-pink-50 to-amber-50 transition-all duration-700">
+        <div class="max-w-md w-full text-center">
+            <!-- Small Floating Flower Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-rose-200 text-rose-500 text-xs sm:text-sm font-medium">
+                <span>🌷</span>
+                <span>Urgent Peace-Offering Delivery</span>
+                <span>🌷</span>
+            </div>
+
+            <!-- Interactive Envelope Card -->
+            <div id="envelope-wrapper" class="relative mx-auto w-full max-w-sm bg-white rounded-3xl shadow-2xl shadow-rose-200/70 border border-rose-100 p-7 sm:p-9 cursor-pointer transition-transform duration-300 hover:scale-[1.02]" onclick="openEnvelope()">
+                <!-- Decorative Envelope Flap SVG -->
+                <div class="envelope-flap absolute top-0 left-0 right-0 h-28 overflow-hidden rounded-t-3xl pointer-events-none">
+                    <svg viewBox="0 0 400 115" preserveAspectRatio="none" class="w-full h-full">
+                        <path d="M0,0 L400,0 L200,105 Z" fill="#ffe4e9" stroke="#fecdd8" stroke-width="2" />
+                    </svg>
+                </div>
+
+                <!-- Wax Seal Button -->
+                <div class="relative z-10 mt-10 mb-5 flex justify-center">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 shadow-lg shadow-rose-300 flex items-center justify-center border-4 border-rose-200 animate-heartbeat">
+                        <span class="text-3xl select-none" aria-hidden="true">💌</span>
+                    </div>
+                </div>
+
+                <p class="font-hand text-3xl sm:text-4xl text-rose-500 mb-1">Dear Suchii,</p>
+                <h1 class="font-serif text-xl sm:text-2xl font-bold text-slate-800 mb-3">
+                    I know you're mad at me...
+                </h1>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed mb-6">
+                    So I grew a secret little garden full of flowers, apologies, and surprises just to bring back your prettiest smile.
+                </p>
+
+                <button type="button" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-semibold shadow-lg shadow-rose-300/60 transition-all active:scale-95 flex items-center justify-center gap-2 text-base">
+                    <span>Tap to Open Your Surprises</span>
+                    <span>🌸</span>
+                </button>
+                <p class="text-xs text-rose-400 mt-3">Sound on recommended for gentle flower chimes ✨</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- FLOATING TOP NAVIGATION & CONTROLS                        -->
+    <!-- ========================================================= -->
+    <header class="sticky top-0 z-30 bg-white/75 backdrop-blur-lg border-b border-rose-100/80">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+            <a href="#top" class="flex items-center gap-2 group">
+                <span class="text-2xl transition-transform group-hover:rotate-12">🌸</span>
+                <span class="font-serif font-bold text-lg sm:text-xl text-rose-600 tracking-tight">For Suchii</span>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+                <a href="#garden" class="hover:text-rose-500 transition-colors">Flower Garden</a>
+                <a href="#surprises" class="hover:text-rose-500 transition-colors">Mystery Gifts</a>
+                <a href="#coupons" class="hover:text-rose-500 transition-colors">Peace Coupons</a>
+                <a href="#verdict" class="hover:text-rose-500 transition-colors">Forgive Me?</a>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <!-- Quick Flower Shower Button -->
+                <button onclick="triggerBouquetShower()" class="px-3.5 py-2 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 text-xs sm:text-sm font-semibold transition-all active:scale-95 flex items-center gap-1.5" title="Shower flowers for Suchii">
+                    <span>💐</span>
+                    <span class="hidden sm:inline">Flower Shower</span>
+                </button>
+
+                <!-- Sound Toggle Button -->
+                <button id="sound-toggle" onclick="toggleSound()" class="p-2.5 rounded-full bg-white border border-rose-200 hover:bg-rose-50 text-rose-500 transition-all active:scale-95 shadow-sm" aria-label="Toggle gentle music box chimes" title="Toggle Chimes">
+                    <span id="sound-icon">🔊</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================= -->
+    <!-- MAIN CONTENT CONTAINER                                    -->
+    <!-- ========================================================= -->
+    <main id="top" class="relative z-10 max-w-5xl mx-auto px-4 pt-8 pb-24 space-y-16 sm:space-y-24">
+
+        <!-- ===================================================== -->
+        <!-- SECTION 1: HEARTFELT HERO & INTERACTIVE MOOD METER    -->
+        <!-- ===================================================== -->
+        <section class="text-center max-w-3xl mx-auto animate-fade-up">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-100/80 border border-rose-200 text-rose-600 text-xs sm:text-sm font-semibold mb-5">
+                <span>✨</span>
+                <span>100% Dedicated to Making Suchii Smile</span>
+                <span>✨</span>
+            </div>
+
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 leading-tight mb-5">
+                I'm Really Sorry, <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500">Suchii</span> 🌷
+            </h1>
+
+            <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl mx-auto">
+                Even when you're angry, you're still my favorite person in the whole world.
+                I hate being the reason your smile disappeared—so let's melt that frown away one flower and surprise at a time.
+            </p>
+
+            <!-- Interactive Grumpiness-to-Smile Meter Card -->
+            <div class="bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl shadow-rose-100/70 border border-rose-100 max-w-xl mx-auto">
+                <div class="flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-500 mb-3">
+                    <span>😤 Super Angry</span>
+                    <span id="mood-status-badge" class="px-3 py-1 rounded-full bg-rose-100 text-rose-600">Current Mood Check</span>
+                    <span>🥰 Melting</span>
+                </div>
+
+                <!-- Interactive Range Slider -->
+                <input id="mood-slider" type="range" min="0" max="100" value="20" oninput="updateMoodMeter(this.value)"
+                    class="w-full h-3 bg-gradient-to-r from-rose-300 via-pink-300 to-emerald-300 rounded-full appearance-none cursor-pointer accent-rose-500">
+
+                <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-rose-50/70 rounded-2xl p-4 border border-rose-100">
+                    <div class="flex items-center gap-3 text-left">
+                        <span id="mood-emoji" class="text-3xl sm:text-4xl transition-transform">😤</span>
+                        <div>
+                            <p id="mood-title" class="font-semibold text-slate-800 text-sm sm:text-base">Level: Extra Spicy Suchii</p>
+                            <p id="mood-desc" class="text-xs sm:text-sm text-slate-600">Slide right as the flowers start working their magic!</p>
+                        </div>
+                    </div>
+                    <button onclick="boostMood()" class="shrink-0 px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs sm:text-sm font-semibold shadow-md shadow-rose-200 transition-all active:scale-95">
+                        Send Emergency Hug 🫂
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- SECTION 2: INTERACTIVE FLOWER GARDEN (FLOWER SURPRISE)-->
+        <!-- ===================================================== -->
+        <section id="garden" class="scroll-mt-24">
+            <div class="text-center mb-6 sm:mb-8">
+                <span class="text-xs font-bold uppercase tracking-widest text-sage-600 bg-sage-100 px-3 py-1 rounded-full">Interactive Flower Surprise</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-900 mt-3 mb-2">
+                    Bloom Your Own Garden, Suchii 🌻
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+                    Tap or click anywhere on the meadow below to plant blooming roses, tulips, sunflowers & cherry blossoms. Every milestone unlocks a secret compliment!
+                </p>
+            </div>
+
+            <!-- Garden Container Card -->
+            <div class="bg-white rounded-3xl shadow-2xl shadow-rose-100/80 border border-rose-100 overflow-hidden">
+                <!-- Garden Controls Bar -->
+                <div class="p-4 sm:px-6 bg-gradient-to-r from-rose-50 via-white to-sage-50 border-b border-rose-100 flex flex-wrap items-center justify-between gap-3">
+                    <!-- Flower Type Selector Pills -->
+                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <button onclick="setFlowerType('random')" data-flower="random" class="flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-rose-500 text-white shadow-sm transition-all">
+                            ✨ Surprise Mix
+                        </button>
+                        <button onclick="setFlowerType('rose')" data-flower="rose" class="flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-white border border-rose-200 text-slate-700 hover:bg-rose-50 transition-all">
+                            🌹 Roses
+                        </button>
+                        <button onclick="setFlowerType('tulip')" data-flower="tulip" class="flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-white border border-rose-200 text-slate-700 hover:bg-rose-50 transition-all">
+                            🌷 Tulips
+                        </button>
+                        <button onclick="setFlowerType('sunflower')" data-flower="sunflower" class="flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-white border border-rose-200 text-slate-700 hover:bg-rose-50 transition-all">
+                            🌻 Sunflowers
+                        </button>
+                        <button onclick="setFlowerType('sakura')" data-flower="sakura" class="flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-white border border-rose-200 text-slate-700 hover:bg-rose-50 transition-all">
+                            🌸 Sakura
+                        </button>
+                    </div>
+
+                    <!-- Bloom Counter Pill -->
+                    <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-rose-200 shadow-sm text-xs sm:text-sm font-semibold text-rose-600">
+                        <span>💐 Blooms:</span>
+                        <span id="flower-count" class="font-bold text-base">0</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Botanical Canvas Area -->
+                <div id="garden-canvas-container" class="relative w-full h-80 sm:h-96 md:h-[430px] bg-gradient-to-b from-sky-50 via-rose-50/40 to-emerald-50 cursor-crosshair select-none overflow-hidden">
+                    <canvas id="garden-canvas"></canvas>
+
+                    <!-- Gentle Hint Overlay (fades after first tap) -->
+                    <div id="garden-hint" class="pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-500">
+                        <div class="px-5 py-3 rounded-2xl bg-white/85 backdrop-blur-sm border border-rose-200 shadow-lg text-rose-500 font-medium text-sm sm:text-base flex items-center gap-2 animate-float">
+                            <span>👆</span>
+                            <span>Tap anywhere here to bloom a flower for Suchii!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Garden Footer Actions -->
+                <div class="p-4 sm:px-6 bg-white border-t border-rose-100 flex flex-wrap items-center justify-between gap-3">
+                    <p id="garden-milestone-text" class="text-xs sm:text-sm text-slate-600 font-medium">
+                        🌱 Plant <span class="text-rose-500 font-bold">5 flowers</span> to unlock your first secret flower note!
+                    </p>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button onclick="bloomInstantBouquet()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white text-xs sm:text-sm font-semibold shadow-md shadow-rose-200 transition-all active:scale-95">
+                            💐 Plant Giant Bouquet
+                        </button>
+                        <button onclick="clearGarden()" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs sm:text-sm font-medium transition-all active:scale-95">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- SECTION 3: UNWRAP-TO-REVEAL MYSTERY SURPRISE BOXES    -->
+        <!-- ===================================================== -->
+        <section id="surprises" class="scroll-mt-24">
+            <div class="text-center mb-8 sm:mb-10">
+                <span class="text-xs font-bold uppercase tracking-widest text-rose-600 bg-rose-100 px-3 py-1 rounded-full">Tap to Unwrap</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-900 mt-3 mb-2">
+                    4 Little Surprises Waiting for You 🎁
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+                    Each gift box hides a special surprise made just for you, Suchii. Tap them one by one to open!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+                <!-- Mystery Box 1: Handwritten Love Letter -->
+                <div onclick="openSurpriseModal('letter', this)" class="gift-wiggle group relative bg-white rounded-3xl p-6 sm:p-7 border-2 border-rose-100 hover:border-rose-300 shadow-lg shadow-rose-100/50 cursor-pointer transition-all hover:-translate-y-1">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">
+                            💌
+                        </div>
+                        <span class="surprise-badge px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Unopened ✨</span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-slate-800 mb-1.5">Surprise #1: A Heartfelt Note</h3>
+                    <p class="text-sm text-slate-500">An honest, zero-excuses letter straight from my heart to yours.</p>
+                </div>
+
+                <!-- Mystery Box 2: Virtual Rose Bouquet Card -->
+                <div onclick="openSurpriseModal('bouquet', this)" class="gift-wiggle group relative bg-white rounded-3xl p-6 sm:p-7 border-2 border-pink-100 hover:border-pink-300 shadow-lg shadow-rose-100/50 cursor-pointer transition-all hover:-translate-y-1">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-14 h-14 rounded-2xl bg-pink-100 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">
+                            💐
+                        </div>
+                        <span class="surprise-badge px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Unopened ✨</span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-slate-800 mb-1.5">Surprise #2: Forever Bouquet</h3>
+                    <p class="text-sm text-slate-500">Handpicked digital flowers that never wilt—plus what each one means.</p>
+                </div>
+
+                <!-- Mystery Box 3: Reasons I Adore Suchii Deck -->
+                <div onclick="openSurpriseModal('reasons', this)" class="gift-wiggle group relative bg-white rounded-3xl p-6 sm:p-7 border-2 border-purple-100 hover:border-purple-300 shadow-lg shadow-rose-100/50 cursor-pointer transition-all hover:-translate-y-1">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">
+                            ✨
+                        </div>
+                        <span class="surprise-badge px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Unopened ✨</span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-slate-800 mb-1.5">Surprise #3: Why You're Amazing</h3>
+                    <p class="text-sm text-slate-500">A shuffleable jar of sweet reasons why I'm completely crazy about you.</p>
+                </div>
+
+                <!-- Mystery Box 4: Official Certificate of Being Right -->
+                <div onclick="openSurpriseModal('certificate', this)" class="gift-wiggle group relative bg-white rounded-3xl p-6 sm:p-7 border-2 border-amber-100 hover:border-amber-300 shadow-lg shadow-rose-100/50 cursor-pointer transition-all hover:-translate-y-1">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">
+                            👑
+                        </div>
+                        <span class="surprise-badge px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Unopened ✨</span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-slate-800 mb-1.5">Surprise #4: Official Decree</h3>
+                    <p class="text-sm text-slate-500">A legally binding (and very cute) certificate settling this forever.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- SECTION 4: REDEEMABLE PEACE-OFFERING COUPONS          -->
+        <!-- ===================================================== -->
+        <section id="coupons" class="scroll-mt-24">
+            <div class="text-center mb-8 sm:mb-10">
+                <span class="text-xs font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-3 py-1 rounded-full">VIP Pass for Suchii</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-900 mt-3 mb-2">
+                    Peace-Offering Coupons 🎟️
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+                    Tap any coupon to claim it right now—no expiration date, zero complaints allowed!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Coupon 1 -->
+                <div class="coupon-card relative bg-white rounded-3xl p-6 border-2 border-dashed border-rose-300 shadow-md flex flex-col justify-between gap-4 overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl">🍨</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full">Valid Anytime</span>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-slate-800">Favorite Food & Dessert Treat</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Craving chocolate, ice cream, coffee, or your favorite comfort meal? Ordered or delivered on demand!</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Favorite Food & Dessert Treat')" class="w-full py-2.5 rounded-xl bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 font-semibold text-sm transition-all active:scale-95">
+                        Claim This Coupon 💕
+                    </button>
+                </div>
+
+                <!-- Coupon 2 -->
+                <div class="coupon-card relative bg-white rounded-3xl p-6 border-2 border-dashed border-pink-300 shadow-md flex flex-col justify-between gap-4 overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl">🎬</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-pink-500 bg-pink-50 px-2.5 py-1 rounded-full">Zero Complaints</span>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-slate-800">Movie / Show Night (Your Pick)</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">You hold full remote control power. Cozy snacks and full attention included.</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Movie Night (Your Pick)')" class="w-full py-2.5 rounded-xl bg-pink-50 hover:bg-pink-500 hover:text-white text-pink-600 font-semibold text-sm transition-all active:scale-95">
+                        Claim This Coupon 💕
+                    </button>
+                </div>
+
+                <!-- Coupon 3 -->
+                <div class="coupon-card relative bg-white rounded-3xl p-6 border-2 border-dashed border-amber-300 shadow-md flex flex-col justify-between gap-4 overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl">🫂</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Unlimited Uses</span>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-slate-800">Extra-Long Warm Hug + Cuddles</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Redeemable for one giant, quiet, cozy hug where I listen to everything you want to say.</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Extra-Long Warm Hug')" class="w-full py-2.5 rounded-xl bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 font-semibold text-sm transition-all active:scale-95">
+                        Claim This Coupon 💕
+                    </button>
+                </div>
+
+                <!-- Coupon 4 -->
+                <div class="coupon-card relative bg-white rounded-3xl p-6 border-2 border-dashed border-emerald-300 shadow-md flex flex-col justify-between gap-4 overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl">💐</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Real Flowers</span>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-slate-800">Real-Life Surprise Bouquet</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Because digital flowers are cute, but Suchii deserves real, fresh blooms too!</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Real-Life Surprise Bouquet')" class="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-700 font-semibold text-sm transition-all active:scale-95">
+                        Claim This Coupon 💕
+                    </button>
+                </div>
+
+                <!-- Coupon 5 -->
+                <div class="coupon-card relative bg-white rounded-3xl p-6 border-2 border-dashed border-purple-300 shadow-md flex flex-col justify-between gap-4 overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl">💆‍♀️</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">VIP Relaxation</span>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-slate-800">Head & Shoulder Massage</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">20 minutes of pure pampering to melt away all stress and annoyance.</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'Head & Shoulder Massage')" class="w-full py-2.5 rounded-xl bg-purple-50 hover:bg-purple-500 hover:text-white text-purple-700 font-semibold text-sm transition-all active:scale-95">
+                        Claim This Coupon 💕
+                    </button>
+                </div>
+
+                <!-- Coupon 6 -->
+                <div class="coupon-card relative bg-white rounded-3xl p-6 border-2 border-dashed border-sky-300 shadow-md flex flex-col justify-between gap-4 overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl">✨</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full">Wildcard</span>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-slate-800">One Custom Wish of Your Choice</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">A late-night drive, a cute date, or a silly favor—you name it, I'll make it happen.</p>
+                    </div>
+                    <button onclick="redeemCoupon(this, 'One Custom Wish')" class="w-full py-2.5 rounded-xl bg-sky-50 hover:bg-sky-500 hover:text-white text-sky-700 font-semibold text-sm transition-all active:scale-95">
+                        Claim This Coupon 💕
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- SECTION 5: PLAYFUL "FORGIVE ME?" FINALE MINI-GAME     -->
+        <!-- ===================================================== -->
+        <section id="verdict" class="scroll-mt-24">
+            <div id="verdict-card" class="relative bg-gradient-to-br from-white via-rose-50/70 to-pink-100/60 rounded-[2rem] p-8 sm:p-12 shadow-2xl shadow-rose-200/60 border border-rose-200 text-center overflow-hidden">
+                <!-- Initial Question View -->
+                <div id="verdict-question">
+                    <div class="text-5xl sm:text-6xl mb-4 animate-float">🥺💐</div>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
+                        So... What's the Verdict, Suchii?
+                    </h2>
+                    <p id="verdict-subtext" class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto mb-8">
+                        Are we calling a truce, sharing a smile, and letting me make it up to you properly?
+                    </p>
+
+                    <!-- Playground Container for Dodging Button -->
+                    <div id="button-arena" class="relative min-h-[150px] sm:min-h-[130px] flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <button id="forgive-btn" onclick="handleForgiven()"
+                            class="z-10 px-8 py-4 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold text-base sm:text-lg shadow-xl shadow-rose-300/70 transition-all duration-300 active:scale-95">
+                            Okay fine, I forgive you! 💕
+                        </button>
+
+                        <button id="stay-mad-btn" onmouseover="dodgeMadButton()" ontouchstart="dodgeMadButton(event)" onclick="dodgeMadButton(event)"
+                            class="px-6 py-3.5 rounded-2xl bg-white border-2 border-slate-200 text-slate-600 font-semibold text-sm sm:text-base shadow-sm transition-all duration-200">
+                            Nope, still angry 😤
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Celebration View (Revealed when forgiven) -->
+                <div id="verdict-celebration" class="hidden animate-fade-up py-4">
+                    <div class="text-6xl sm:text-7xl mb-4 animate-heartbeat">🌸💖🌸</div>
+                    <h2 class="font-serif text-3xl sm:text-5xl font-bold text-rose-600 mb-3">
+                        Yay!! Peace Restored! 🎉
+                    </h2>
+                    <p class="font-hand text-2xl sm:text-3xl text-slate-700 mb-4">
+                        Thank you for having the biggest, sweetest heart, Suchii.
+                    </p>
+                    <p class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto mb-8">
+                        Now text me which coupon you want to redeem first—I owe you extra hugs, flowers, and endless love!
+                    </p>
+                    <div class="flex flex-wrap items-center justify-center gap-3">
+                        <button onclick="launchFlowerFireworks()" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 text-white font-semibold shadow-lg shadow-rose-300 transition-all hover:scale-105 active:scale-95">
+                            🎆 More Flower Fireworks!
+                        </button>
+                        <button onclick="copySweetReply()" class="px-6 py-3.5 rounded-2xl bg-white border border-rose-200 text-rose-600 font-semibold shadow-sm hover:bg-rose-50 transition-all active:scale-95">
+                            📋 Copy "Fine, You're Forgiven" Text
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 text-center py-8 px-4 border-t border-rose-100 bg-white/60 backdrop-blur-sm">
+        <p class="font-hand text-2xl text-rose-500 mb-1">Made with all my heart for Suchii</p>
+        <p class="text-xs text-slate-400">Always here to make you smile, one flower at a time 🌸</p>
+    </footer>
+
+    <!-- Floating Pocket-Hug Button (Bottom Right) -->
+    <button onclick="sendPocketHug()" class="fixed bottom-5 right-5 z-30 px-4 py-3 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xl shadow-rose-300/80 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-sm font-semibold" title="Get a random sweet compliment & pocket hug">
+        <span class="text-lg">🌸</span>
+        <span class="hidden sm:inline">Pocket Compliment</span>
+    </button>
+
+    <!-- ========================================================= -->
+    <!-- SURPRISE MODAL (CUSTOM DIALOG - NO ALERT/CONFIRM)         -->
+    <!-- ========================================================= -->
+    <div id="surprise-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
+        <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-rose-100 overflow-hidden animate-fade-up max-h-[88vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-rose-50 to-pink-50 border-b border-rose-100 flex items-center justify-between">
+                <h3 id="modal-title" class="font-serif text-xl font-bold text-rose-600">A Surprise for Suchii</h3>
+                <button onclick="closeSurpriseModal()" class="w-9 h-9 rounded-full bg-white hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center font-bold transition-colors" aria-label="Close modal">
+                    ✕
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div id="modal-body" class="p-6 overflow-y-auto text-slate-700 leading-relaxed">
+                <!-- Populated dynamically via JS -->
+            </div>
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeSurpriseModal()" class="px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-semibold text-sm transition-all active:scale-95">
+                    Close with a Smile 🌸
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- TOAST NOTIFICATION CONTAINER                              -->
+    <!-- ========================================================= -->
+    <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 w-[90%] max-w-md pointer-events-none"></div>
+
+    <!-- ========================================================= -->
+    <!-- APPLICATION JAVASCRIPT                                    -->
+    <!-- ========================================================= -->
+    <script>
+        /* =========================================================
+           1. GLOBAL STATE & GENTLE AUDIO ENGINE (Tone.js)
+           ========================================================= */
+        let soundEnabled = true;
+        let synth = null;
+        let selectedFlowerType = 'random';
+        let gardenFlowers = [];
+        let gardenSparkles = [];
+        let ambientPetals = [];
+        let burstPetals = [];
+        let flowerCount = 0;
+        let dodgeAttempts = 0;
+        let reasonIndex = 0;
+
+        // Pentatonic scale notes for dreamy music-box flower chimes
+        const CHIME_NOTES = ['C5', 'D5', 'E5', 'G5', 'A5', 'C6', 'D6', 'E6'];
+
+        // Sweet compliments for Pocket Hug & Flower Milestones
+        const SWEET_NOTES = [
+            "Suchii, your smile literally makes my entire day 100x brighter ✨",
+            "Even your grumpy face is unfairly adorable, Suchii 🥺🌸",
+            "Fun fact: Out of 8 billion people, you're still my favorite one 💕",
+            "Sending you a warm virtual forehead kiss & a fresh rose 🌹",
+            "You deserve all the patience, care, and flowers in the world 🌷",
+            "My favorite sound is still your laugh—can't wait to hear it again 🎶",
+            "No matter what, I'm always on Team Suchii 👑💖"
+        ];
+
+        // Deck of reasons for Mystery Surprise #3
+        const REASONS_DECK = [
+            "The way your eyes light up whenever you talk about something you love.",
+            "How caring, thoughtful, and wonderfully genuine your heart is.",
+            "Even when we bicker, I'd still rather figure things out with you than anyone else.",
+            "Your laugh—it's honestly my favorite melody in the entire universe.",
+            "How you make ordinary, boring days feel warm and magical just by being in them.",
+            "The little quirks and expressions that are uniquely, irreplacably Suchii.",
+            "Because loving you is the easiest and best decision I make every single day."
+        ];
+
+        /**
+         * Safely initializes Tone.js polyphonic music-box synthesizer on user gesture.
+         */
+        function initAudio() {
+            try {
+                if (typeof Tone === 'undefined') return;
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                if (!synth) {
+                    synth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.02, decay: 0.35, sustain: 0.08, release: 1.1 }
+                    }).toDestination();
+                    synth.volume.value = -14;
+                }
+            } catch (err) {
+                console.warn('Audio init skipped:', err);
+            }
+        }
+
+        /**
+         * Plays a single soft pentatonic chime note.
+         */
+        function playChime(noteIndex = null) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!synth) return;
+                const idx = noteIndex !== null ? noteIndex % CHIME_NOTES.length : Math.floor(Math.random() * CHIME_NOTES.length);
+                synth.triggerAttackRelease(CHIME_NOTES[idx], '8n');
+            } catch (err) {
+                // Gracefully ignore audio errors
+            }
+        }
+
+        /**
+         * Plays a soft rising arpeggio chord for celebrations & surprises.
+         */
+        function playCelebrationArpeggio() {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!synth) return;
+                const now = Tone.now();
+                ['C5', 'E5', 'G5', 'B5', 'C6'].forEach((note, i) => {
+                    synth.triggerAttackRelease(note, '8n', now + i * 0.09);
+                });
+            } catch (err) {
+                // Gracefully ignore audio errors
+            }
+        }
+
+        /**
+         * Toggles chime sound on/off.
+         */
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            icon.textContent = soundEnabled ? '🔊' : '🔇';
+            if (soundEnabled) {
+                playChime(4);
+                showToast('Gentle flower chimes turned on 🎶');
+            } else {
+                showToast('Sound muted 🔇');
+            }
+        }
+
+        /* =========================================================
+           2. TOAST NOTIFICATION HELPER (NO ALERT())
+           ========================================================= */
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto px-5 py-3 rounded-2xl bg-slate-900/90 text-white text-xs sm:text-sm font-medium shadow-xl border border-rose-400/40 backdrop-blur-md text-center transition-all duration-300 opacity-0 translate-y-[-10px]';
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            // Trigger entrance animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('opacity-0', 'translate-y-[-10px]');
+            });
+
+            // Remove automatically
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 350);
+            }, 3400);
+        }
+
+        /* =========================================================
+           3. INTRO ENVELOPE OPENING
+           ========================================================= */
+        function openEnvelope() {
+            initAudio();
+            playCelebrationArpeggio();
+
+            const wrapper = document.getElementById('envelope-wrapper');
+            const overlay = document.getElementById('intro-overlay');
+            wrapper.classList.add('envelope-open');
+
+            // Launch welcoming petal burst
+            triggerBouquetShower(false);
+
+            setTimeout(() => {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    // Plant 3 starter welcome flowers in Suchii's garden
+                    seedWelcomeFlowers();
+                    showToast('Welcome to your surprise garden, Suchii! 🌸');
+                }, 650);
+            }, 420);
+        }
+
+        /* =========================================================
+           4. MOOD METER INTERACTION
+           ========================================================= */
+        function updateMoodMeter(val) {
+            const v = Number(val);
+            const emoji = document.getElementById('mood-emoji');
+            const title = document.getElementById('mood-title');
+            const desc = document.getElementById('mood-desc');
+
+            if (v < 25) {
+                emoji.textContent = '😤';
+                title.textContent = 'Level: Extra Spicy Suchii';
+                desc.textContent = 'Completely fair. Deploying emergency flowers & extra apologies!';
+            } else if (v < 50) {
+                emoji.textContent = '😒';
+                title.textContent = 'Level: Side-Eyeing Gently';
+                desc.textContent = 'Hmm... maybe a few more blooms and a dessert coupon will help?';
+            } else if (v < 75) {
+                emoji.textContent = '🥺';
+                title.textContent = 'Level: Fighting Back a Smile';
+                desc.textContent = 'Ooh! I think I spotted a tiny corner of a smile right there!';
+            } else if (v < 95) {
+                emoji.textContent = '😊';
+                title.textContent = 'Level: Soft & Forgiving Suchii';
+                desc.textContent = 'My heart is so happy right now. Keep exploring your surprises!';
+            } else {
+                emoji.textContent = '🥰';
+                title.textContent = 'Level: Maximum Sunshine Mode!';
+                desc.textContent = 'The prettiest smile in the world is officially back! 🌸💖';
+                playCelebrationArpeggio();
+                spawnPetalBurst(window.innerWidth / 2, window.innerHeight / 3, 28);
+            }
+        }
+
+        function boostMood() {
+            const slider = document.getElementById('mood-slider');
+            const nextVal = Math.min(100, Number(slider.value) + 25);
+            slider.value = nextVal;
+            updateMoodMeter(nextVal);
+            playChime();
+            spawnPetalBurst(window.innerWidth / 2, window.innerHeight * 0.4, 22);
+            showToast('Emergency warm hug delivered to Suchii! 🫂💕');
+        }
+
+        /* =========================================================
+           5. INTERACTIVE PROCEDURAL FLOWER GARDEN CANVAS
+           ========================================================= */
+        const gardenCanvas = document.getElementById('garden-canvas');
+        const gardenCtx = gardenCanvas.getContext('2d');
+        const gardenContainer = document.getElementById('garden-canvas-container');
+
+        const FLOWER_PALETTES = {
+            rose: ['#f43f5e', '#e11d48', '#fb7185', '#be123c'],
+            tulip: ['#fb7185', '#f472b6', '#c084fc', '#fb923c', '#fda4af'],
+            sunflower: ['#facc15', '#fbbf24', '#f59e0b'],
+            sakura: ['#fbcfe8', '#f9a8d4', '#fda4af', '#ffe4e6']
+        };
+
+        /**
+         * Resizes the garden canvas responsively based on its parent container.
+         */
+        function resizeGardenCanvas() {
+            try {
+                const rect = gardenContainer.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                gardenCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+                gardenCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+                gardenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            } catch (err) {
+                console.warn('Garden resize error:', err);
+            }
+        }
+
+        /**
+         * Changes active flower brush pill.
+         */
+        function setFlowerType(type) {
+            selectedFlowerType = type;
+            document.querySelectorAll('.flower-pill').forEach(btn => {
+                if (btn.dataset.flower === type) {
+                    btn.className = 'flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-rose-500 text-white shadow-sm transition-all';
+                } else {
+                    btn.className = 'flower-pill px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-white border border-rose-200 text-slate-700 hover:bg-rose-50 transition-all';
+                }
+            });
+            playChime();
+        }
+
+        /**
+         * Plants a flower at (x, y) inside the garden canvas.
+         */
+        function plantFlower(x, y, forceType = null, silent = false) {
+            const rect = gardenContainer.getBoundingClientRect();
+            const types = ['rose', 'tulip', 'sunflower', 'sakura'];
+            const type = forceType || (selectedFlowerType === 'random'
+                ? types[Math.floor(Math.random() * types.length)]
+                : selectedFlowerType);
+
+            const palette = FLOWER_PALETTES[type];
+            const color = palette[Math.floor(Math.random() * palette.length)];
+
+            // Keep blossoms gracefully positioned above the grassy base
+            const clampedY = Math.max(42, Math.min(rect.height - 45, y));
+
+            gardenFlowers.push({
+                x: x,
+                y: clampedY,
+                baseX: x + (Math.random() - 0.5) * 24,
+                baseY: rect.height + 6,
+                type: type,
+                color: color,
+                size: 18 + Math.random() * 14,
+                growth: 0.01,
+                swayPhase: Math.random() * Math.PI * 2,
+                swaySpeed: 0.018 + Math.random() * 0.015,
+                curveOffset: (Math.random() - 0.5) * 35
+            });
+
+            // Add golden blooming sparkles at click point
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.4;
+                const speed = 1 + Math.random() * 2.2;
+                gardenSparkles.push({
+                    x: x,
+                    y: clampedY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 0.5,
+                    alpha: 1,
+                    size: 2.5 + Math.random() * 2.5,
+                    color: i % 2 === 0 ? '#fb7185' : '#fbbf24'
+                });
+            }
+
+            // Hide initial hint
+            const hint = document.getElementById('garden-hint');
+            if (hint) hint.style.opacity = '0';
+
+            // Update count & milestone surprises
+            flowerCount++;
+            document.getElementById('flower-count').textContent = flowerCount;
+
+            if (!silent) {
+                playChime(flowerCount % CHIME_NOTES.length);
+                checkFlowerMilestones();
+            }
+        }
+
+        /**
+         * Unlocks sweet secret messages as Suchii plants more flowers.
+         */
+        function checkFlowerMilestones() {
+            const milestoneEl = document.getElementById('garden-milestone-text');
+            if (flowerCount === 5) {
+                playCelebrationArpeggio();
+                showToast('🌸 Milestone Unlocked (5 Blooms): "Suchii, you make every season feel like spring!"');
+                milestoneEl.innerHTML = '🌷 Secret #1 unlocked! Plant <span class="text-rose-500 font-bold">12 flowers</span> for the next sweet note!';
+            } else if (flowerCount === 12) {
+                playCelebrationArpeggio();
+                showToast('💐 Milestone Unlocked (12 Blooms): "A whole dozen flowers for the prettiest girl in the room!"');
+                milestoneEl.innerHTML = '🌻 Secret #2 unlocked! Plant <span class="text-rose-500 font-bold">20 flowers</span> for the golden surprise!';
+            } else if (flowerCount === 20) {
+                playCelebrationArpeggio();
+                spawnPetalBurst(window.innerWidth / 2, window.innerHeight / 2, 40);
+                showToast('👑 Master Florist Suchii (20 Blooms): "I promise to keep choosing you & cherishing you always!"');
+                milestoneEl.innerHTML = '💖 All flower milestones unlocked! Keep blooming as many as your heart wants, Suchii!';
+            }
+        }
+
+        /**
+         * Plants 3 welcome flowers on load so the garden looks alive immediately.
+         */
+        function seedWelcomeFlowers() {
+            const rect = gardenContainer.getBoundingClientRect();
+            if (rect.width < 50) return;
+            plantFlower(rect.width * 0.25, rect.height * 0.55, 'rose', true);
+            plantFlower(rect.width * 0.5, rect.height * 0.45, 'sunflower', true);
+            plantFlower(rect.width * 0.75, rect.height * 0.58, 'tulip', true);
+        }
+
+        /**
+         * Instantly plants a lush bouquet of 9 flowers across the canvas.
+         */
+        function bloomInstantBouquet() {
+            const rect = gardenContainer.getBoundingClientRect();
+            playCelebrationArpeggio();
+            const types = ['rose', 'tulip', 'sunflower', 'sakura'];
+            for (let i = 0; i < 9; i++) {
+                setTimeout(() => {
+                    const spreadX = rect.width * (0.14 + (i / 8) * 0.72) + (Math.random() - 0.5) * 28;
+                    const spreadY = rect.height * (0.3 + Math.random() * 0.42);
+                    plantFlower(spreadX, spreadY, types[i % types.length], i !== 8);
+                }, i * 75);
+            }
+            spawnPetalBurst(window.innerWidth / 2, window.innerHeight * 0.45, 32);
+            showToast('A fresh bouquet just bloomed for you, Suchii! 💐');
+        }
+
+        /**
+         * Clears garden flowers for a fresh canvas.
+         */
+        function clearGarden() {
+            gardenFlowers = [];
+            flowerCount = 0;
+            document.getElementById('flower-count').textContent = '0';
+            const hint = document.getElementById('garden-hint');
+            if (hint) hint.style.opacity = '1';
+            showToast('Fresh meadow ready for new flowers 🌱');
+        }
+
+        /**
+         * Draws a single procedural botanical flower on the garden canvas.
+         */
+        function drawFlower(f, time) {
+            const ease = 1 - Math.pow(1 - f.growth, 3);
+            const sway = Math.sin(time * f.swaySpeed + f.swayPhase) * 6 * ease;
+            const headX = f.x + sway;
+            const headY = f.baseY - (f.baseY - f.y) * ease;
+
+            // 1. Draw curved emerald stem
+            gardenCtx.save();
+            gardenCtx.beginPath();
+            gardenCtx.moveTo(f.baseX, f.baseY);
+            const cpX = (f.baseX + headX) / 2 + f.curveOffset * 0.5;
+            const cpY = (f.baseY + headY) / 2;
+            gardenCtx.quadraticCurveTo(cpX, cpY, headX, headY);
+            gardenCtx.strokeStyle = '#15803d';
+            gardenCtx.lineWidth = Math.max(2, f.size * 0.12);
+            gardenCtx.lineCap = 'round';
+            gardenCtx.stroke();
+
+            // 2. Draw pair of soft leaves along the stem
+            if (ease > 0.35) {
+                const leafT = 0.52;
+                const lx = (1 - leafT) * (1 - leafT) * f.baseX + 2 * (1 - leafT) * leafT * cpX + leafT * leafT * headX;
+                const ly = (1 - leafT) * (1 - leafT) * f.baseY + 2 * (1 - leafT) * leafT * cpY + leafT * leafT * headY;
+                const leafScale = Math.min(1, (ease - 0.35) / 0.4) * (f.size * 0.52);
+
+                gardenCtx.fillStyle = '#22c55e';
+                // Right leaf
+                gardenCtx.save();
+                gardenCtx.translate(lx, ly);
+                gardenCtx.rotate(-0.55 + sway * 0.02);
+                gardenCtx.beginPath();
+                gardenCtx.ellipse(leafScale * 0.7, 0, leafScale, leafScale * 0.42, 0, 0, Math.PI * 2);
+                gardenCtx.fill();
+                gardenCtx.restore();
+
+                // Left leaf
+                gardenCtx.save();
+                gardenCtx.translate(lx, ly + 8);
+                gardenCtx.rotate(Math.PI + 0.55 + sway * 0.02);
+                gardenCtx.beginPath();
+                gardenCtx.ellipse(leafScale * 0.65, 0, leafScale * 0.9, leafScale * 0.38, 0, 0, Math.PI * 2);
+                gardenCtx.fill();
+                gardenCtx.restore();
+            }
+
+            // 3. Draw blossom head based on flower species
+            const r = f.size * ease;
+            gardenCtx.translate(headX, headY);
+            gardenCtx.rotate(sway * 0.015);
+
+            if (f.type === 'sunflower') {
+                // Golden layered petals
+                const petalCount = 14;
+                for (let i = 0; i < petalCount; i++) {
+                    gardenCtx.save();
+                    gardenCtx.rotate((Math.PI * 2 * i) / petalCount);
+                    gardenCtx.fillStyle = i % 2 === 0 ? '#facc15' : '#f59e0b';
+                    gardenCtx.beginPath();
+                    gardenCtx.ellipse(r * 0.78, 0, r * 0.52, r * 0.2, 0, 0, Math.PI * 2);
+                    gardenCtx.fill();
+                    gardenCtx.restore();
+                }
+                // Warm chocolate center
+                gardenCtx.fillStyle = '#78350f';
+                gardenCtx.beginPath();
+                gardenCtx.arc(0, 0, r * 0.48, 0, Math.PI * 2);
+                gardenCtx.fill();
+                gardenCtx.fillStyle = '#92400e';
+                gardenCtx.beginPath();
+                gardenCtx.arc(-r * 0.1, -r * 0.1, r * 0.25, 0, Math.PI * 2);
+                gardenCtx.fill();
+
+            } else if (f.type === 'tulip') {
+                // Cupped tulip petals
+                gardenCtx.fillStyle = f.color;
+                // Left petal
+                gardenCtx.beginPath();
+                gardenCtx.ellipse(-r * 0.34, -r * 0.1, r * 0.42, r * 0.8, -0.28, 0, Math.PI * 2);
+                gardenCtx.fill();
+                // Right petal
+                gardenCtx.beginPath();
+                gardenCtx.ellipse(r * 0.34, -r * 0.1, r * 0.42, r * 0.8, 0.28, 0, Math.PI * 2);
+                gardenCtx.fill();
+                // Center highlight petal
+                gardenCtx.fillStyle = 'rgba(255,255,255,0.22)';
+                gardenCtx.beginPath();
+                gardenCtx.ellipse(0, -r * 0.15, r * 0.45, r * 0.88, 0, 0, Math.PI * 2);
+                gardenCtx.fill();
+
+            } else if (f.type === 'sakura') {
+                // 5 delicate cherry blossom petals
+                for (let i = 0; i < 5; i++) {
+                    gardenCtx.save();
+                    gardenCtx.rotate((Math.PI * 2 * i) / 5);
+                    gardenCtx.fillStyle = f.color;
+                    gardenCtx.beginPath();
+                    gardenCtx.moveTo(0, 0);
+                    gardenCtx.bezierCurveTo(r * 0.55, -r * 0.45, r * 1.15, -r * 0.2, r * 0.95, 0);
+                    gardenCtx.bezierCurveTo(r * 1.15, r * 0.2, r * 0.55, r * 0.45, 0, 0);
+                    gardenCtx.fill();
+                    gardenCtx.restore();
+                }
+                // Soft pink center + golden dots
+                gardenCtx.fillStyle = '#fb7185';
+                gardenCtx.beginPath();
+                gardenCtx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+                gardenCtx.fill();
+                gardenCtx.fillStyle = '#fde047';
+                for (let d = 0; d < 5; d++) {
+                    const ang = (Math.PI * 2 * d) / 5;
+                    gardenCtx.beginPath();
+                    gardenCtx.arc(Math.cos(ang) * r * 0.3, Math.sin(ang) * r * 0.3, r * 0.07, 0, Math.PI * 2);
+                    gardenCtx.fill();
+                }
+
+            } else {
+                // Lush spiraling rose
+                for (let layer = 3; layer >= 1; layer--) {
+                    const count = layer * 4;
+                    const layerR = (r * layer) / 3.1;
+                    for (let i = 0; i < count; i++) {
+                        const ang = (Math.PI * 2 * i) / count + layer * 0.5;
+                        gardenCtx.fillStyle = layer === 3 ? f.color : (layer === 2 ? '#fb7185' : '#ffe4e6');
+                        gardenCtx.globalAlpha = layer === 1 ? 0.85 : 0.95;
+                        gardenCtx.beginPath();
+                        gardenCtx.arc(Math.cos(ang) * layerR * 0.45, Math.sin(ang) * layerR * 0.45, layerR * 0.58, 0, Math.PI * 2);
+                        gardenCtx.fill();
+                    }
+                }
+                gardenCtx.globalAlpha = 1;
+                gardenCtx.fillStyle = '#be123c';
+                gardenCtx.beginPath();
+                gardenCtx.arc(0, 0, r * 0.2, 0, Math.PI * 2);
+                gardenCtx.fill();
+            }
+
+            gardenCtx.restore();
+        }
+
+        // Handle clicks/taps on garden canvas
+        gardenCanvas.addEventListener('click', (e) => {
+            const rect = gardenCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            plantFlower(x, y);
+        });
+
+        /* =========================================================
+           6. AMBIENT FALLING PETALS & FLOWER FIREWORKS OVERLAY
+           ========================================================= */
+        const petalCanvas = document.getElementById('petal-overlay-canvas');
+        const petalCtx = petalCanvas.getContext('2d');
+
+        function resizePetalCanvas() {
+            petalCanvas.width = window.innerWidth;
+            petalCanvas.height = window.innerHeight;
+        }
+
+        function initAmbientPetals() {
+            ambientPetals = [];
+            const count = window.innerWidth < 640 ? 14 : 24;
+            const colors = ['#fecdd3', '#fda4af', '#fbcfe8', '#fde68a', '#f9a8d4'];
+            for (let i = 0; i < count; i++) {
+                ambientPetals.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    size: 6 + Math.random() * 8,
+                    speedY: 0.45 + Math.random() * 0.85,
+                    speedX: (Math.random() - 0.5) * 0.6,
+                    angle: Math.random() * Math.PI * 2,
+                    spin: (Math.random() - 0.5) * 0.03,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+        }
+
+        /**
+         * Spawns celebratory flower petals bursting from (x, y).
+         */
+        function spawnPetalBurst(x, y, count = 30) {
+            const colors = ['#f43f5e', '#fb7185', '#f472b6', '#fbbf24', '#c084fc', '#fda4af'];
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2.5 + Math.random() * 6.5;
+                burstPetals.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 2.5,
+                    gravity: 0.11,
+                    size: 6 + Math.random() * 8,
+                    angle: Math.random() * Math.PI * 2,
+                    spin: (Math.random() - 0.5) * 0.16,
+                    alpha: 1,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+        }
+
+        function triggerBouquetShower(withToast = true) {
+            playCelebrationArpeggio();
+            spawnPetalBurst(window.innerWidth * 0.25, window.innerHeight * 0.25, 28);
+            spawnPetalBurst(window.innerWidth * 0.5, window.innerHeight * 0.2, 36);
+            spawnPetalBurst(window.innerWidth * 0.75, window.innerHeight * 0.25, 28);
+            if (withToast) {
+                showToast('Flower shower incoming for Suchii! 🌸🌷🌹');
+            }
+        }
+
+        function launchFlowerFireworks() {
+            playCelebrationArpeggio();
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    const rx = window.innerWidth * (0.2 + Math.random() * 0.6);
+                    const ry = window.innerHeight * (0.2 + Math.random() * 0.4);
+                    spawnPetalBurst(rx, ry, 34);
+                }, i * 240);
+            }
+        }
+
+        /* =========================================================
+           7. MAIN ANIMATION LOOP (GARDEN + PETALS)
+           ========================================================= */
+        let animTime = 0;
+
+        function animateLoop() {
+            animTime++;
+
+            // --- A. Render Interactive Flower Garden ---
+            try {
+                const rect = gardenContainer.getBoundingClientRect();
+                gardenCtx.clearRect(0, 0, rect.width, rect.height);
+
+                // Soft decorative meadow hills at bottom of garden
+                gardenCtx.fillStyle = '#d1fae5';
+                gardenCtx.beginPath();
+                gardenCtx.moveTo(0, rect.height);
+                gardenCtx.quadraticCurveTo(rect.width * 0.28, rect.height - 46, rect.width * 0.6, rect.height - 20);
+                gardenCtx.quadraticCurveTo(rect.width * 0.82, rect.height - 6, rect.width, rect.height - 32);
+                gardenCtx.lineTo(rect.width, rect.height);
+                gardenCtx.closePath();
+                gardenCtx.fill();
+
+                gardenCtx.fillStyle = '#a7f3d0';
+                gardenCtx.beginPath();
+                gardenCtx.moveTo(0, rect.height);
+                gardenCtx.quadraticCurveTo(rect.width * 0.5, rect.height - 32, rect.width, rect.height - 12);
+                gardenCtx.lineTo(rect.width, rect.height);
+                gardenCtx.closePath();
+                gardenCtx.fill();
+
+                // Update & draw flowers
+                for (let i = 0; i < gardenFlowers.length; i++) {
+                    const f = gardenFlowers[i];
+                    if (f.growth < 1) {
+                        f.growth = Math.min(1, f.growth + 0.042);
+                    }
+                    drawFlower(f, animTime);
+                }
+
+                // Update & draw garden sparkles
+                for (let i = gardenSparkles.length - 1; i >= 0; i--) {
+                    const s = gardenSparkles[i];
+                    s.x += s.vx;
+                    s.y += s.vy;
+                    s.alpha -= 0.028;
+                    if (s.alpha <= 0) {
+                        gardenSparkles.splice(i, 1);
+                        continue;
+                    }
+                    gardenCtx.save();
+                    gardenCtx.globalAlpha = s.alpha;
+                    gardenCtx.fillStyle = s.color;
+                    gardenCtx.beginPath();
+                    gardenCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    gardenCtx.fill();
+                    gardenCtx.restore();
+                }
+            } catch (err) {
+                // Keep loop resilient
+            }
+
+            // --- B. Render Ambient Falling Petals & Celebration Bursts ---
+            try {
+                petalCtx.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+
+                for (let i = 0; i < ambientPetals.length; i++) {
+                    const p = ambientPetals[i];
+                    p.y += p.speedY;
+                    p.x += p.speedX + Math.sin(animTime * 0.015 + i) * 0.35;
+                    p.angle += p.spin;
+
+                    if (p.y > petalCanvas.height + 20) {
+                        p.y = -20;
+                        p.x = Math.random() * petalCanvas.width;
+                    }
+
+                    petalCtx.save();
+                    petalCtx.translate(p.x, p.y);
+                    petalCtx.rotate(p.angle);
+                    petalCtx.globalAlpha = 0.62;
+                    petalCtx.fillStyle = p.color;
+                    petalCtx.beginPath();
+                    petalCtx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+                    petalCtx.fill();
+                    petalCtx.restore();
+                }
+
+                for (let i = burstPetals.length - 1; i >= 0; i--) {
+                    const b = burstPetals[i];
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    b.vy += b.gravity;
+                    b.angle += b.spin;
+                    b.alpha -= 0.012;
+
+                    if (b.alpha <= 0) {
+                        burstPetals.splice(i, 1);
+                        continue;
+                    }
+
+                    petalCtx.save();
+                    petalCtx.translate(b.x, b.y);
+                    petalCtx.rotate(b.angle);
+                    petalCtx.globalAlpha = b.alpha;
+                    petalCtx.fillStyle = b.color;
+                    petalCtx.beginPath();
+                    petalCtx.ellipse(0, 0, b.size, b.size * 0.58, 0, 0, Math.PI * 2);
+                    petalCtx.fill();
+                    petalCtx.restore();
+                }
+            } catch (err) {
+                // Keep loop resilient
+            }
+
+            requestAnimationFrame(animateLoop);
+        }
+
+        /* =========================================================
+           8. MYSTERY SURPRISE MODALS
+           ========================================================= */
+        function openSurpriseModal(type, cardEl) {
+            playCelebrationArpeggio();
+            spawnPetalBurst(window.innerWidth / 2, window.innerHeight * 0.35, 25);
+
+            // Mark mystery gift box as opened
+            if (cardEl) {
+                const badge = cardEl.querySelector('.surprise-badge');
+                if (badge) {
+                    badge.textContent = 'Opened 💖';
+                    badge.className = 'surprise-badge px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700';
+                }
+            }
+
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+
+            if (type === 'letter') {
+                titleEl.textContent = '💌 A Heartfelt Note for Suchii';
+                bodyEl.innerHTML = `
+                    <div class="bg-rose-50/70 rounded-2xl p-5 sm:p-6 border border-rose-100 space-y-4">
+                        <p class="font-hand text-3xl text-rose-500">Dearest Suchii,</p>
+                        <p class="text-sm sm:text-base text-slate-700">
+                            I just want to say I'm genuinely, deeply sorry for upsetting you. No excuses, no trying to brush it off—your feelings matter to me more than winning any silly argument or being right.
+                        </p>
+                        <p class="text-sm sm:text-base text-slate-700">
+                            You bring so much warmth, laughter, and light into my life. Whenever you're hurt or angry, my whole world feels a little out of tune until we're okay again.
+                        </p>
+                        <p class="text-sm sm:text-base text-slate-700">
+                            Thank you for putting up with me even on my clumsy days. I promise to listen better, care deeper, and keep trying to be the person who makes you feel cherished every single day.
+                        </p>
+                        <p class="font-hand text-2xl text-rose-600 pt-2 text-right">Always yours, with endless hugs 🌸</p>
+                    </div>
+                `;
+            } else if (type === 'bouquet') {
+                titleEl.textContent = '💐 Your Forever Bouquet, Suchii';
+                bodyEl.innerHTML = `
+                    <div class="text-center space-y-4">
+                        <div class="py-4 bg-gradient-to-b from-rose-50 to-white rounded-2xl border border-rose-100">
+                            <div class="text-5xl sm:text-6xl tracking-widest animate-float">🌹🌷🌻🌸💐</div>
+                            <p class="font-hand text-2xl text-rose-500 mt-3">Handpicked so they never fade</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left text-xs sm:text-sm">
+                            <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-100">
+                                <span class="font-bold text-rose-600">🌹 Red Rose:</span> Because I adore you endlessly.
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-100">
+                                <span class="font-bold text-amber-700">🌻 Sunflower:</span> Because you're my favorite sunshine.
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-pink-50 border border-pink-100">
+                                <span class="font-bold text-pink-600">🌷 Tulip:</span> For fresh starts & sweet patience.
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-purple-50 border border-purple-100">
+                                <span class="font-bold text-purple-600">🌸 Cherry Blossom:</span> Because every moment with you is precious.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'reasons') {
+                titleEl.textContent = '✨ Why I Adore You, Suchii';
+                bodyEl.innerHTML = `
+                    <div class="text-center space-y-5">
+                        <p class="text-xs uppercase tracking-wider font-bold text-rose-400">Reason #<span id="reason-num">${reasonIndex + 1}</span> of ${REASONS_DECK.length}</p>
+                        <div class="min-h-[120px] flex items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-rose-50 to-purple-50 border border-rose-100">
+                            <p id="reason-text" class="font-serif text-lg sm:text-xl italic text-slate-800">"${REASONS_DECK[reasonIndex]}"</p>
+                        </div>
+                        <button onclick="nextReason()" class="px-5 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-600 font-semibold text-sm transition-all active:scale-95">
+                            Show Another Reason ✨
+                        </button>
+                    </div>
+                `;
+            } else if (type === 'certificate') {
+                titleEl.textContent = '👑 Official Peace Decree';
+                bodyEl.innerHTML = `
+                    <div class="p-6 rounded-2xl border-4 border-double border-amber-300 bg-amber-50/40 text-center space-y-3">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-700">Certificate of Undisputed Awesomeness</p>
+                        <h4 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">Awarded to Suchii</h4>
+                        <p class="text-sm text-slate-600">
+                            This document officially certifies that <strong>Suchii was 100% right</strong>, deserves extra pampering, unlimited flowers, and zero future silliness from me.
+                        </p>
+                        <div class="pt-4 flex items-center justify-between text-xs text-slate-500 border-t border-amber-200/80">
+                            <span>Status: Forever Forgiven? 🥺</span>
+                            <span class="font-hand text-xl text-rose-600">Sealed with 💖</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const modal = document.getElementById('surprise-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function nextReason() {
+            reasonIndex = (reasonIndex + 1) % REASONS_DECK.length;
+            const textEl = document.getElementById('reason-text');
+            const numEl = document.getElementById('reason-num');
+            if (textEl && numEl) {
+                textEl.textContent = `"${REASONS_DECK[reasonIndex]}"`;
+                numEl.textContent = reasonIndex + 1;
+                playChime(reasonIndex);
+            }
+        }
+
+        function closeSurpriseModal() {
+            const modal = document.getElementById('surprise-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Close modal when clicking backdrop
+        document.getElementById('surprise-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'surprise-modal') closeSurpriseModal();
+        });
+
+        /* =========================================================
+           9. COUPON REDEMPTION WITH ANIMATED STAMP
+           ========================================================= */
+        function redeemCoupon(btn, couponName) {
+            if (btn.dataset.claimed === 'true') {
+                showToast(`Already claimed! Remind me anytime for your ${couponName} 💕`);
+                return;
+            }
+            btn.dataset.claimed = 'true';
+            btn.textContent = 'Claimed by Suchii ✓';
+            btn.className = 'w-full py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm cursor-default shadow-inner';
+
+            // Add tilted vintage stamp badge onto card
+            const card = btn.closest('.coupon-card');
+            if (card) {
+                const stamp = document.createElement('div');
+                stamp.className = 'animate-stamp pointer-events-none absolute top-4 right-4 px-2.5 py-1 rounded-lg border-2 border-rose-500 text-rose-600 font-extrabold text-[11px] uppercase tracking-wider bg-white/90 shadow-sm';
+                stamp.textContent = 'CLAIMED 💕';
+                card.appendChild(stamp);
+            }
+
+            playCelebrationArpeggio();
+            const rect = btn.getBoundingClientRect();
+            spawnPetalBurst(rect.left + rect.width / 2, rect.top, 20);
+            showToast(`Yay! "${couponName}" is officially yours, Suchii! 🎟️🌸`);
+        }
+
+        /* =========================================================
+           10. PLAYFUL "FORGIVE ME?" DODGING BUTTON MINI-GAME
+           ========================================================= */
+        const DODGE_PLEAS = [
+            "Wait, what about ice cream? 🍨",
+            "Pretty please, Suchii? 🥺",
+            "I brought flowers though! 💐",
+            "You can't catch this button! 😜",
+            "What if I add extra hugs? 🫂",
+            "Okay fine, click the pink one! 💕"
+        ];
+
+        function dodgeMadButton(event) {
+            if (event && event.type === 'touchstart') {
+                event.preventDefault();
+            }
+            const btn = document.getElementById('stay-mad-btn');
+            const arena = document.getElementById('button-arena');
+            const forgiveBtn = document.getElementById('forgive-btn');
+            const subtext = document.getElementById('verdict-subtext');
+
+            dodgeAttempts++;
+            playChime(dodgeAttempts % CHIME_NOTES.length);
+
+            // Switch button to playful floating position inside the arena
+            btn.style.position = 'absolute';
+            const arenaRect = arena.getBoundingClientRect();
+            const btnRect = btn.getBoundingClientRect();
+
+            const maxX = Math.max(10, arenaRect.width - btnRect.width - 12);
+            const maxY = Math.max(10, arenaRect.height - btnRect.height - 12);
+            const randX = Math.floor(Math.random() * maxX);
+            const randY = Math.floor(Math.random() * maxY);
+
+            btn.style.left = `${randX}px`;
+            btn.style.top = `${randY}px`;
+            btn.textContent = DODGE_PLEAS[(dodgeAttempts - 1) % DODGE_PLEAS.length];
+
+            // Gently grow the Forgive button to make it extra inviting
+            const scaleBoost = Math.min(1.18, 1 + dodgeAttempts * 0.03);
+            forgiveBtn.style.transform = `scale(${scaleBoost})`;
+
+            // Update pleading subtitle
+            if (dodgeAttempts === 2) {
+                subtext.textContent = "Hehe, the angry button is too shy to be clicked, Suchii! 🌸";
+            } else if (dodgeAttempts >= 4) {
+                subtext.textContent = "I promise real flowers, your favorite treats, and the biggest hug ever! 🥺💖";
+            }
+
+            // Leave a tiny trail of petals behind the dodging button
+            const absRect = btn.getBoundingClientRect();
+            spawnPetalBurst(absRect.left + absRect.width / 2, absRect.top + absRect.height / 2, 8);
+        }
+
+        function handleForgiven() {
+            document.getElementById('verdict-question').classList.add('hidden');
+            document.getElementById('verdict-celebration').classList.remove('hidden');
+
+            // Set mood meter to 100% smiling!
+            const slider = document.getElementById('mood-slider');
+            if (slider) {
+                slider.value = 100;
+                updateMoodMeter(100);
+            }
+
+            launchFlowerFireworks();
+            showToast('Best news ever!! Thank you, Suchii! 💖🌸');
+        }
+
+        /* =========================================================
+           11. CLIPBOARD HELPER & POCKET COMPLIMENT
+           ========================================================= */
+        function copySweetReply() {
+            const text = "Okay fine, you're forgiven 🙄💕 Now bring me my flowers & coupons!";
+            try {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = text;
+                tempInput.style.position = 'fixed';
+                tempInput.style.opacity = '0';
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                playChime(6);
+                showToast('Copied! Paste & send it to me right now 💌');
+            } catch (err) {
+                showToast('Message: "' + text + '" 💕');
+            }
+        }
+
+        function sendPocketHug() {
+            playChime();
+            const msg = SWEET_NOTES[Math.floor(Math.random() * SWEET_NOTES.length)];
+            spawnPetalBurst(window.innerWidth - 60, window.innerHeight - 60, 18);
+            showToast(msg);
+        }
+
+        /* =========================================================
+           12. WINDOW LOAD & RESIZE INITIALIZATION
+           ========================================================= */
+        window.onload = function () {
+            resizeGardenCanvas();
+            resizePetalCanvas();
+            initAmbientPetals();
+            animateLoop();
+        };
+
+        window.addEventListener('resize', () => {
+            resizeGardenCanvas();
+            resizePetalCanvas();
+            initAmbientPetals();
+        });
+    </script>
+</body>
+</html>
